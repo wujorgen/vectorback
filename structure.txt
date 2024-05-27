@@ -1,0 +1,27 @@
+|-- Asset
+|   |-- Ticker
+|   |-- Historical Price Data
+|   |-- Indicators
+|   |-- Methods: load_data, compute_indicators
+|
+|-- Indicator (Abstract Base Class)
+|   |-- Type
+|   |-- Parameters
+|   |-- Methods: calculate
+|
+|-- Portfolio
+|   |-- Initial Capital
+|   |-- Cash Balance
+|   |-- Positions
+|   |-- Transaction History
+|   |-- Methods: buy, sell, update_value, calculate_metrics
+|
+|-- Strategy (Abstract Base Class)
+|   |-- Parameters
+|   |-- Methods: generate_signals
+|
+|-- Backtester
+|   |-- Portfolio Object
+|   |-- Strategy Object
+|   |-- Simulation Period
+|   |-- Methods: run_backtest, update_portfolio, record_performance
