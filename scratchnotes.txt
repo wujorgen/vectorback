@@ -1,0 +1,30 @@
+for Portfolio class:
+
+portfolio contains assets.
+
+assets have both a series of prices and pct returns.
+the asset could be represented in portfolio returns via:
+1) series of prices * series of share amounts
+2) series of percent returns * series of weights
+when one of these is updated via input, the other will need to be updated as well
+so, to store assets:
+assets is dict of asset objects
+share amounts will be stored in shares, 
+    as a DataFrame where row index is date, columns are tickers, values are shares
+weights will be stored in weights,
+    as a DataFrame where row index is date, columns are tickers, values are weights
+
+Back to the portfolio!
+initialize portfolio with a default of 10k cash, recorded both as cash and initial capital.
+cash can be updated to account for contributions. 
+    this might make metric calculations tricky since it wont be reflected in weights,
+    but eh we'll fix it later
+
+methods:
+-trim_dates -> call during constructor, to make sure date indexes of all DFs match
+-add_asset -> defaults to adding asset with weights of zero.
+    -> really shitty way of adding it to the "universe".
+-buy/sell -> allow both weight or share amount as arg, adding one will update the other.
+-update_value -> TODO: need to think more about this, but updates value after shares and weights
+                to update cash value for next transaction.
+-update transaction history -> TODO: decide format, but purpose is self-explanatory
