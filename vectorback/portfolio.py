@@ -8,6 +8,7 @@ class Portfolio:
         self._initial_capital = initial_capital
         self._cash = initial_capital
         self._assets = {}
+        self._tickers = []
         self._weights = pd.DataFrame()
         self._shares = pd.DataFrame()
         self._transaction_history = []
@@ -36,6 +37,18 @@ class Portfolio:
     @property
     def shares(self):
         return self._shares
+
+    @property
+    def transaction_history(self):
+        return self._transaction_history
+
+    @property
+    def total_value_history(self):
+        return self._total_value_history
+
+    def trim_dates(self):
+        """This function trims the dates of all asset data to match."""
+        pass
 
     def add_asset(self, asset):
         self._assets[asset.ticker] = asset
@@ -75,14 +88,6 @@ class Portfolio:
             if self._total_value_history
             else self._initial_capital
         )
-
-    @property
-    def transaction_history(self):
-        return self._transaction_history
-
-    @property
-    def total_value_history(self):
-        return self._total_value_history
 
 
 # Example usage
