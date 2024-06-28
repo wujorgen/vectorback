@@ -1,55 +1,132 @@
 """Defines metrics for evaluating strategies."""
 
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
+from warnings import warn
 
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from dataset import Dataset
 
 
 def sharpe_ratio(
     returns: pd.Series | np.ndarray | list,
     target_return: pd.Series | np.ndarray | list | float = 0.0,
-    lookback: int = 250,
     period: str = "1d",
+    window: int = -100,
 ) -> float:
-    if period not in ["1d", "1w", "1m"]:
-        raise ValueError("Specified period for data is not valid. Use 1d, 1w, or 1m.")
-    if type(returns) == pd.Series:
-        returns = returns.values
-    elif type(returns) == list:
-        returns = np.array(list)
-    r = returns.mean() / returns.std()
+    """Calculates Sharpe Ratio."""
+    match type(returns):
+        case pd.Series:
+            returns = returns.values
+        case list:
+            returns = np.array(returns)
+
+    warnstr = (
+        "Sharpe Ratio calculation ({period}) has been provided data of length {length}. "
+        + "This is less than the window size of {window}."
+    )
+    multiplier = 1.0
+
     match period:
         case "1d":
-            r *= 250**0.5
+            # window is 252 days
+            window = 252 if window == -100 else window
+            multiplier = 252**0.5
+            if len(returns) < window:
+                warn(warnstr.format(period=period, length=len(returns), window=window))
         case "1w":
-            r *= 50**0.5
+            # window is 52 weeks
+            window = 52 if window == -100 else window
+            multiplier = 52**0.5
+            if len(returns) < window:
+                warn(warnstr.format(period=period, length=len(returns), window=window))
         case "1m":
-            r *= 12**0.5
+            # window is 12 months
+            window = 12 if window == -100 else window
+            multiplier = 12**0.5
+            if len(returns) < window:
+                warn(warnstr.format(period=period, length=len(returns), window=window))
+        case "1y":
+            # window is past 10 years
+            window = 10 if window == -100 else window
+            if len(returns) < window:
+                warn(warnstr.format(period=period, length=len(returns), window=window))
+        case _:
+            raise ValueError(
+                "Specified period for data is not valid. Use 1d, 1w, 1m, or 1y."
+            )
+
+    match type(target_return):
+        case pd.Series:
+            target_return = target_return.values
+        case list:
+            target_return = np.array(target_return)
+
+    r = (returns - target_return).mean() / returns.std() * multiplier
+
     return r
 
 
 def sortino_ratio(
     returns: pd.Series | np.ndarray | list,
     target_return: pd.Series | np.ndarray | list | float = 0.0,
-    lookback: int = 250,
     period: str = "1d",
+    window: int = -100,
 ) -> float:
-    if period not in ["1d", "1w", "1m"]:
-        raise ValueError("Specified period for data is not valid. Use 1d, 1w, or 1m.")
-    if type(returns) == pd.Series:
-        returns = returns.values
-    elif type(returns) == list:
-        returns = np.array(list)
-    r = returns.mean() / np.where(returns < 0, 0.0, returns).std()
+    """Calculates Sortino Ratio."""
+    match type(returns):
+        case pd.Series:
+            returns = returns.values
+        case list:
+            returns = np.array(returns)
+
+    warnstr = (
+        "Sortino Ratio calculation ({period}) has been provided data of length {length}. "
+        + "This is less than the window size of {window}."
+    )
+    multiplier = 1.0
+
     match period:
         case "1d":
-            r *= 250**0.5
+            # window is 252 days
+            window = 252 if window == -100 else window
+            multiplier = 252**0.5
+            if len(returns) < window:
+                warn(warnstr.format(period=period, length=len(returns), window=window))
         case "1w":
-            r *= 50**0.5
+            # window is 52 weeks
+            window = 52 if window == -100 else window
+            multiplier = 52**0.5
+            if len(returns) < window:
+                warn(warnstr.format(period=period, length=len(returns), window=window))
         case "1m":
-            r *= 12**0.5
+            # window is 12 months
+            window = 12 if window == -100 else window
+            multiplier = 12**0.5
+            if len(returns) < window:
+                warn(warnstr.format(period=period, length=len(returns), window=window))
+        case "1y":
+            # window is past 10 years
+            window = 10 if window == -100 else window
+            if len(returns) < window:
+                warn(warnstr.format(period=period, length=len(returns), window=window))
+        case _:
+            raise ValueError(
+                "Specified period for data is not valid. Use 1d, 1w, 1m, or 1y."
+            )
+
+    match type(target_return):
+        case pd.Series:
+            target_return = target_return.values
+        case list:
+            target_return = np.array(target_return)
+
+    r = (
+        (returns - target_return).mean()
+        / np.where(returns < 0, 0.0, returns).std()
+        * multiplier
+    )
+
     return r
 
 
@@ -88,4 +165,5 @@ if __name__ == "__main__":
     print(data.returns)
     print(sharpe_ratio(data.returns["NVDA"]))
     print(sortino_ratio(data.returns["NVDA"]))
+    print(sortino_ratio(data.returns["NVDA"].values.tolist()))
     breakpoint()

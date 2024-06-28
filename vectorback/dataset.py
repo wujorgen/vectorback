@@ -21,7 +21,7 @@ class Dataset:
 
     @property
     def dates(self) -> tuple[pd.Timestamp]:
-        return self.data.index[0], self.data.index[1]
+        return self.data.index[0], self.data.index[-1]
 
     @property
     def prices(self) -> pd.DataFrame:
